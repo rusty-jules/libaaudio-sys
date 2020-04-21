@@ -1,0 +1,3 @@
+### Set the default target to cross-compilation so we get rls back
+[build]
+target = "i686-linux-android"
