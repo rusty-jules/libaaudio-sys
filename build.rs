@@ -11,12 +11,14 @@ fn main() {
 
     let android_home = PathBuf::from(env::var("ANDROID_HOME").expect("ANDROID_HOME must be set"));
     
-    if !android_home.join("ndk-bundle").exists() {
-        panic!("Android NDK must be installed")
-    }
+    let android_ndk = if !android_home.join("ndk-bundle").exists() {
+        PathBuf::from(env::var("ANDROID_NDK_HOME").expect("Android NDK must be installed"))
+    } else {
+        android_home.join("ndk-bundle")
+    };
 
-    let android_sysroot = android_home.join("ndk-bundle/sysroot");
-    let android_include = android_home.join("ndk-bundle/sysroot/usr/include");
+    let android_sysroot = android_ndk.join("sysroot");
+    let android_include = android_ndk.join("sysroot/usr/include");
     
     let os   = env::var("CARGO_CFG_TARGET_OS").expect("Can't build without os");
     let arch = env::var("CARGO_CFG_TARGET_ARCH").expect("Can't build without arch");
@@ -31,8 +33,8 @@ fn main() {
         a => panic!("Unsupported architecture {}", a)
     };
 
-    let android_prebuilt_include = android_home.join(
-        &format!("ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/{}/{}", target, ANDROID_VERSION)
+    let android_prebuilt_include = android_ndk.join(
+        &format!("toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/{}/{}", target, ANDROID_VERSION)
     );
     let aaudio_dylib_path = android_prebuilt_include.join("libaaudio.so");
 
