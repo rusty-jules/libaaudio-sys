@@ -32,9 +32,18 @@ fn main() {
         "x86_64" => "x86_64-linux-android",
         a => panic!("Unsupported architecture {}", a)
     };
+    
+    let host_path = std::fs::read_dir(android_ndk.join("toolchains/llvm/prebuilt"))
+        .expect("Path to prebuilt libs in ndk")
+        .nth(0)
+        .unwrap()
+        .unwrap()
+        .file_name()
+        .into_string()
+        .unwrap();
 
     let android_prebuilt_include = android_ndk.join(
-        &format!("toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/{}/{}", target, ANDROID_VERSION)
+        &format!("toolchains/llvm/prebuilt/{}/sysroot/usr/lib/{}/{}", host_path, target, ANDROID_VERSION)
     );
     let aaudio_dylib_path = android_prebuilt_include.join("libaaudio.so");
 
